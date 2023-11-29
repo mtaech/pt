@@ -1,26 +1,20 @@
 #![warn(clippy::all, rust_2018_idioms)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use egui::IconData;
-use image::ImageFormat;
-use rust_embed::{EmbeddedFile, RustEmbed};
 use std::io::Cursor;
 
-#[derive(RustEmbed)]
-#[folder = "assets"]
-struct Assets;
+use egui::IconData;
+use image::ImageFormat;
 
 fn main() -> eframe::Result<()> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([800.0, 300.0])
-            .with_min_inner_size([600.0, 220.0])
+            .with_inner_size([1200.0, 1000.0])
+            .with_min_inner_size([1000.0, 750.0])
             .with_icon(load_icon()),
         ..Default::default()
     };
-    let assets = Assets::get("favicon.ico");
-    if assets.is_some() {}
     eframe::run_native(
         "pt",
         native_options,

@@ -3,5 +3,6 @@
 mod app;
 mod init;
 mod tabs;
+mod views;
 
 pub use app::PtApp;
