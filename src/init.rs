@@ -1,6 +1,11 @@
+use std::fs;
+use std::path::PathBuf;
+
 use egui::FontFamily::{Monospace, Proportional};
-use egui::FontSelection::Style;
 use egui::{Color32, FontDefinitions, FontId, TextStyle, Visuals};
+use egui::Shape::Path;
+use rusqlite::{Connection, OpenFlags};
+use sled::Db;
 
 ///初始化字体
 pub fn init_default_font() -> FontDefinitions {

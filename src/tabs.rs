@@ -2,7 +2,7 @@ use chrono::Local;
 use egui::{Ui, WidgetText};
 use egui_dock::TabViewer;
 
-use crate::views::manipulation::Manipulation;
+use crate::views::operator::Manipulation;
 
 #[derive(Debug)]
 pub struct TabsDef {
@@ -12,8 +12,8 @@ pub struct TabsDef {
 
 #[derive(Debug)]
 pub enum TabsId {
-    Manipulation,
-    Data,
+    Operator,
+    Analysis,
 }
 
 pub type Tab = TabsDef;
@@ -44,10 +44,10 @@ impl TabViewer for PtTabsViewer {
     // Defines the contents of a given `tab`.
     fn ui(&mut self, ui: &mut Ui, tab: &mut Self::Tab) {
         match tab.id {
-            TabsId::Manipulation => {
-                self.manipulation.new(ui);
+            TabsId::Operator => {
+                self.manipulation.show(ui);
             }
-            TabsId::Data => {
+            TabsId::Analysis => {
                 ui.label(format!("Content of {:#?}", tab));
             }
         }

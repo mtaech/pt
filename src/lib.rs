@@ -1,8 +1,7 @@
-#![warn(clippy::all, rust_2018_idioms)]
-
-mod app;
-mod init;
-mod tabs;
-mod views;
-
-pub use app::PtApp;
+pub mod schema;
+pub mod app;
+pub mod cmd;
+pub mod init;
+pub mod tabs;
+pub mod views;
+pub mod db;

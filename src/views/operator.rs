@@ -1,9 +1,11 @@
 use std::fmt::Display;
+use std::path::PathBuf;
 
 use eframe::epaint::Color32;
 use egui::{Label, Ui};
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
+use crate::cmd::operator::add_dir_data;
 
 use crate::views::models::{FileOperate, FileTypes};
 
@@ -32,7 +34,7 @@ impl Manipulation {
     pub(crate) fn default() -> Self {
         Default::default()
     }
-    pub fn new(&mut self, ui: &mut Ui) {
+    pub fn show(&mut self, ui: &mut Ui) {
         ui.horizontal(|ui| {
             ui.label("文件操作目录:");
             ui.set_min_width(500.0);
@@ -150,14 +152,8 @@ impl Manipulation {
             if ui.button("开始执行").clicked() {
                 println!("开始执行 {:?}", self.operate_type);
                 self.msg_list.clear();
-                /* let _result = match self.operate_type {
-                    FileOperate::Copy => self.copy(),
-                    FileOperate::CopyReserve => self.copy_reserve(),
-                    FileOperate::Delete => self.delete(),
-                    FileOperate::DeleteReserve => self.delete_reserve(),
-                    FileOperate::Move => self.move_file(),
-                    FileOperate::MoveReserve => self.move_reserve(),
-                };*/
+                add_dir_data("source_data",PathBuf::from(&self.main_dir));
+                add_dir_data("target_data",PathBuf::from(&self.compare_dir));
             }
         });
     }

@@ -1,13 +1,21 @@
 #![warn(clippy::all, rust_2018_idioms)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+use std::cell::OnceCell;
 use std::io::Cursor;
 
 use egui::IconData;
 use image::ImageFormat;
+use rusqlite::Connection;
+use pt_plus::app::PtApp;
+use pt_plus::db;
+
+
+pub const DB: OnceCell<Connection> = OnceCell::new();
 
 fn main() -> eframe::Result<()> {
-    env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
+    env_logger::init();
+    db::init_db();
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([1200.0, 1000.0])
@@ -16,9 +24,9 @@ fn main() -> eframe::Result<()> {
         ..Default::default()
     };
     eframe::run_native(
-        "pt",
+        "PT",
         native_options,
-        Box::new(|cc| Box::new(pt_plus::PtApp::new(cc))),
+        Box::new(|cc| Box::new(PtApp::new(cc))),
     )
 }
 fn load_icon() -> IconData {

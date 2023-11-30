@@ -1,2 +1,2 @@
-pub mod manipulation;
 mod models;
+pub mod operator;

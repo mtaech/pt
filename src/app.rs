@@ -18,11 +18,11 @@ impl Default for PtApp {
         let tabs = [
             TabsDef {
                 title: "图片操作".to_string(),
-                id: TabsId::Manipulation,
+                id: TabsId::Operator,
             },
             TabsDef {
                 title: "图片数据".to_string(),
-                id: TabsId::Data,
+                id: TabsId::Analysis,
             },
         ]
         .into_iter()
@@ -58,7 +58,7 @@ impl eframe::App for PtApp {
                 });
                 ui.add_space(16.0);
             });*/
-            egui::widgets::global_dark_light_mode_buttons(ui);
+            egui::widgets::global_dark_light_mode_switch(ui);
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
