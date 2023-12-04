@@ -18,8 +18,6 @@ fn main() -> eframe::Result<()> {
     db::init_db();
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([1200.0, 1000.0])
-            .with_min_inner_size([1000.0, 750.0])
             .with_icon(load_icon()),
         ..Default::default()
     };

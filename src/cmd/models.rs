@@ -1,4 +1,3 @@
-use diesel::{Insertable, Queryable, Selectable};
 #[derive(Debug)]
 pub struct FileInfo{
     pub name:String,
@@ -6,8 +5,7 @@ pub struct FileInfo{
     pub ext:Option<String>
 }
 
-#[derive(Debug,Queryable, Selectable,Insertable)]
-#[diesel(table_name = source_data)]
+#[derive(Debug)]
 pub struct SourceData{
     pub name:String,
     pub path:String,
@@ -15,8 +13,7 @@ pub struct SourceData{
 }
 
 
-#[derive(Debug,Queryable, Selectable)]
-#[diesel(table_name = target_data)]
+#[derive(Debug)]
 pub struct TargetData{
     pub name:String,
     pub path:String,

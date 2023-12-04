@@ -1,7 +1,5 @@
--- Your SQL goes here
 drop table if exists source_data;
-create table source_data
-(
+create table source_data(
     id           integer primary key autoincrement,
     name         text not null,
     path         text not null,
@@ -10,9 +8,8 @@ create table source_data
     camera_model text
 );
 drop table if exists target_data;
-create table target_data
-(
-    id           integer primary key autoincrement ,
+create table target_data(
+    id           integer primary key autoincrement,
     name         text not null,
     path         text not null,
     ext          text not null default '',
