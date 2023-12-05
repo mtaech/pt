@@ -1,15 +1,21 @@
 use std::fmt::Display;
 use std::path::PathBuf;
+use eframe::CreationContext;
 
 use eframe::epaint::Color32;
-use egui::{Label, Ui};
+use eframe::glow::Context;
+use egui::{Label, ProgressBar, Ui, Widget};
+use egui::accesskit::Role::ProgressIndicator;
+use egui::CursorIcon::Progress;
+use egui_modal::Modal;
+use image::load;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
-use crate::cmd::operator::add_dir_data;
+use crate::cmd::operator::insert_dir_data;
 
 use crate::views::models::{FileOperate, FileTypes};
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default,Serialize, Deserialize)]
 pub struct Manipulation {
     ///操作目录
     pub main_dir: String,
@@ -35,6 +41,7 @@ impl Manipulation {
         Default::default()
     }
     pub fn show(&mut self, ui: &mut Ui) {
+        let mut modal = loading_modal(ui.ctx());
         ui.horizontal(|ui| {
             ui.label("文件操作目录:");
             ui.set_min_width(500.0);
@@ -149,12 +156,42 @@ impl Manipulation {
             ui.add_space(5.0);
         });
         ui.horizontal(|ui| {
-            if ui.button("开始执行").clicked() {
+            let btn = ui.button("开始执行");
+            if btn.clicked() {
+                ui.set_visible(false);
                 println!("开始执行 {:?}", self.operate_type);
                 self.msg_list.clear();
-                add_dir_data("source_data",PathBuf::from(&self.main_dir));
-                add_dir_data("target_data",PathBuf::from(&self.compare_dir));
+                if !&self.main_dir.is_empty() {
+                    insert_dir_data("source_data", PathBuf::from(&self.main_dir));
+                }
+                if !&self.compare_dir.is_empty() {
+                    insert_dir_data("target_data", PathBuf::from(&self.compare_dir));
+                }
+                println!("iam close");
+                // modal.close();
             }
         });
     }
+}
+
+
+fn loading_modal(ctx:&egui::Context)->Modal{
+    let mut modal = Modal::new(ctx, "loading_modal");
+
+// What goes inside the modal
+    modal.show(|ui| {
+        // these helper functions help set the ui based on the modal's
+        // set style, but they are not required and you can put whatever
+        // ui you want inside [`.show()`]
+        // modal.title(ui, "loading");
+        modal.frame(ui, |ui| {
+            ui.spinner();
+        });
+       /* modal.buttons(ui, |ui| {
+            // After clicking, the modal is automatically closed
+            if modal.button(ui, "close").clicked() {
+            };
+        });*/
+    });
+    modal
 }

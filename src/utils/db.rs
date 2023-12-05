@@ -10,7 +10,7 @@ pub fn init_db() {
         fs::remove_file("./pt.db").unwrap();
     }
     let conn:Connection = get_conn();
-    let init_sql = include_str!("../sql/init.sql");
+    let init_sql = include_str!("../../sql/init.sql");
     conn.execute_batch(init_sql).expect("init error");
 }
 

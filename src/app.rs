@@ -1,7 +1,8 @@
 use egui_dock::{DockArea, DockState, Style, TabViewer};
+use egui_modal::Modal;
 
-use crate::init;
 use crate::tabs::{PtTabsViewer, Tab, TabsDef, TabsId};
+use crate::utils::init;
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]

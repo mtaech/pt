@@ -8,14 +8,14 @@ use egui::IconData;
 use image::ImageFormat;
 use rusqlite::Connection;
 use pt_plus::app::PtApp;
-use pt_plus::db;
+use pt_plus::utils::db::init_db;
 
 
 pub const DB: OnceCell<Connection> = OnceCell::new();
 
 fn main() -> eframe::Result<()> {
     env_logger::init();
-    db::init_db();
+    init_db();
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_icon(load_icon()),

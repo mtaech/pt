@@ -5,12 +5,11 @@ use egui::FontFamily::{Monospace, Proportional};
 use egui::{Color32, FontDefinitions, FontId, TextStyle, Visuals};
 use egui::Shape::Path;
 use rusqlite::{Connection, OpenFlags};
-use sled::Db;
 
 ///初始化字体
 pub fn init_default_font() -> FontDefinitions {
     let mut fonts = egui::FontDefinitions::default();
-    let font = include_bytes!("../assets/LXGWWenKaiScreen.ttf");
+    let font = include_bytes!("../../assets/LXGWWenKaiScreen.ttf");
     fonts.font_data.insert(
         "LXGWWenKaiScreen".to_owned(),
         egui::FontData::from_owned(Vec::from(font)),
