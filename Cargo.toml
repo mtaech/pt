@@ -30,7 +30,7 @@ lazy_static = "1.4.0"
 rusqlite = { version = "0.30.0", features = ["bundled"] }
 js-sys = "0.3.66"
 quickraw = "0.1.6"
-#libopenraw = "0.1.2"
+libopenraw = "0.1.2"
 kamadak-exif = "0.5.5"
 
 

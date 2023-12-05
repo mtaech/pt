@@ -1685,6 +1685,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "libopenraw"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9bda1f80c35a387f8e198fd2d0b75c78daa533408dcaa50f6f46b754bc5c1844"
+dependencies = [
+ "lazy_static",
+ "libopenraw-sys",
+]
+
+[[package]]
+name = "libopenraw-sys"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71f2ab11748f9bd57d1d3ad3df9d423efa78b23b11a1243f37eac4bd63f4aede"
+dependencies = [
+ "pkg-config",
+]
+
+[[package]]
 name = "libsqlite3-sys"
 version = "0.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2271,6 +2290,7 @@ dependencies = [
  "js-sys",
  "kamadak-exif",
  "lazy_static",
+ "libopenraw",
  "log",
  "quickraw",
  "rfd",
