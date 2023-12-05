@@ -1,3 +1,4 @@
+begin ;
 drop table if exists source_data;
 create table source_data(
     id           integer primary key autoincrement,
@@ -16,4 +17,4 @@ create table target_data(
     size         integer       default 0,
     camera_model text
 );
-
+commit ;

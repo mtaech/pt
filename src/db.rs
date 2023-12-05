@@ -11,7 +11,7 @@ pub fn init_db() {
     }
     let conn:Connection = get_conn();
     let init_sql = include_str!("../sql/init.sql");
-    conn.execute(init_sql,()).expect("init error");
+    conn.execute_batch(init_sql).expect("init error");
 }
 
 pub fn get_conn() -> Connection {

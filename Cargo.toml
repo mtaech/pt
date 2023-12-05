@@ -8,8 +8,14 @@ rust-version = "1.72"
 
 [dependencies]
 egui = "0.24.1"
-eframe = { version = "0.24.1", default-features = false, features = ["default","persistence"] }
+eframe = { version = "0.24.1", default-features = false, features = [
+    "accesskit",     # Make egui comptaible with screen readers. NOTE: adds a lot of dependencies.
+    "glow",          # Use the glow rendering backend. Alternative: "wgpu".
+    "wayland",
+    "x11",
+    "persistence",  ] }
 log = "0.4"
+
 
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }
@@ -22,6 +28,10 @@ strum = {version = "0.25.0",features = ["derive","strum_macros"]}
 sled = { version = "0.34.7", features = ["zstd"] }
 lazy_static = "1.4.0"
 rusqlite = { version = "0.30.0", features = ["bundled"] }
+js-sys = "0.3.66"
+quickraw = "0.1.6"
+#libopenraw = "0.1.2"
+kamadak-exif = "0.5.5"
 
 
 [profile.release]

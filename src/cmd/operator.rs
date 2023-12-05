@@ -1,5 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
+use rusqlite::params;
 
 use crate::cmd::models::TargetData;
 
@@ -15,8 +16,9 @@ pub fn add_dir_data(table_name: &str, dir_path: PathBuf) {
             let path = &file_path.to_str().unwrap();
             let name = &file_path.file_name().unwrap().to_str().unwrap();
             let ext = get_ext(&file_path).to_owned();
-            conn.execute(format!("INSERT INTO {} (name,path,ext) VALUES (:name)", table_name).as_str(),
-                         (name, path, ext)).expect("");
+
+            conn.execute(format!("INSERT INTO {} (name,path,ext) VALUES (?1,?2,?3)", table_name).as_str(),
+                         params![name, path, ext]).expect("");
         }
     }
 }
