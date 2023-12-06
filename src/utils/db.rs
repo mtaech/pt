@@ -61,14 +61,14 @@ pub fn find_non_same_name(source_type: &str, target_type: &str) -> Vec<FileInfo>
     let conn = get_conn();
     let mut stat = conn.prepare(&sql).unwrap();
     let rows = stat
-        .query_map(params![target_type, source_type], |row| {
+        .query_map([], |row| {
             Ok(FileInfo {
-                name: row.get_unwrap(0),
-                path: row.get_unwrap(1),
-                ext: row.get_unwrap(2),
+                name: row.get(0).expect("get name error"),
+                path: row.get(1).expect("get path error"),
+                ext: row.get(2).expect("get ext error"),
             })
         })
-        .unwrap();
+        .expect("get row error");
     let mut file_infos = Vec::new();
     for result in rows {
         file_infos.push(result.unwrap());
