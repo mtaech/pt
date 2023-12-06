@@ -2,8 +2,8 @@ use std::fs;
 use std::path::PathBuf;
 
 use egui::FontFamily::{Monospace, Proportional};
-use egui::{Color32, FontDefinitions, FontId, TextStyle, Visuals};
 use egui::Shape::Path;
+use egui::{Color32, FontDefinitions, FontId, TextStyle, Visuals};
 use rusqlite::{Connection, OpenFlags};
 
 ///初始化字体

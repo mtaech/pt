@@ -15,6 +15,7 @@ pub enum FileTypes {
     PNG,
     GIF,
     TIFF,
+    DNG,
 }
 
 impl FileTypes {
@@ -31,6 +32,7 @@ impl Display for FileTypes {
             FileTypes::NEF => write!(f, "NEF"),
             FileTypes::ARW => write!(f, "ARW"),
             FileTypes::ORF => write!(f, "ORF"),
+            FileTypes::DNG => write!(f, "DNG"),
             FileTypes::JPG => write!(f, "JPG"),
             FileTypes::PNG => write!(f, "PNG"),
             FileTypes::GIF => write!(f, "GIF"),
@@ -52,6 +54,7 @@ impl From<FileTypes> for String {
             FileTypes::PNG => "PNG".into(),
             FileTypes::GIF => "GIF".into(),
             FileTypes::TIFF => "TIFF".into(),
+            FileTypes::DNG => "DNG".into(),
         }
     }
 }

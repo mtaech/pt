@@ -6,10 +6,9 @@ use std::io::Cursor;
 
 use egui::IconData;
 use image::ImageFormat;
-use rusqlite::Connection;
 use pt_plus::app::PtApp;
 use pt_plus::utils::db::init_db;
-
+use rusqlite::Connection;
 
 pub const DB: OnceCell<Connection> = OnceCell::new();
 
@@ -18,11 +17,13 @@ fn main() -> eframe::Result<()> {
     init_db();
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
+            .with_inner_size([1000.0, 750.0])
+            .with_min_inner_size([800.0, 600.0])
             .with_icon(load_icon()),
         ..Default::default()
     };
     eframe::run_native(
-        "PT",
+        "Photo Tools",
         native_options,
         Box::new(|cc| Box::new(PtApp::new(cc))),
     )

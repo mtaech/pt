@@ -1,23 +1,17 @@
 use std::fmt::Display;
 use std::path::PathBuf;
-use chrono::Local;
-use eframe::CreationContext;
 
+use chrono::Local;
 use eframe::epaint::Color32;
-use eframe::glow::Context;
-use egui::{Label, ProgressBar, Ui, Widget};
-use egui::accesskit::DefaultActionVerb::Select;
-use egui::accesskit::Role::ProgressIndicator;
-use egui::CursorIcon::Progress;
+use egui::{Label, Ui};
 use egui_modal::Modal;
-use image::load;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
-use crate::cmd::operator::insert_dir_data;
 
+use crate::cmd::operator::{copy_non_same, copy_same, delete_none_same, delete_same, insert_dir_data, move_none_same, move_same};
 use crate::views::models::{FileOperate, FileTypes};
 
-#[derive(Default,Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct Manipulation {
     ///操作目录
     pub main_dir: String,
@@ -36,15 +30,15 @@ pub struct Manipulation {
     pub msg_list: Vec<String>,
     #[serde(skip)]
     operate_type: FileOperate,
-    show_btn:bool
+    show_btn: bool,
 }
 
 impl Manipulation {
     pub(crate) fn init() -> Self {
-        Manipulation{
-           show_btn:true,
-           ..Manipulation::default()
-       }
+        Manipulation {
+            show_btn: true,
+            ..Manipulation::default()
+        }
     }
     pub fn show(&mut self, ui: &mut Ui) {
         ui.horizontal(|ui| {
@@ -91,7 +85,7 @@ impl Manipulation {
                     ui.set_min_width(60.0);
                     for file_type in FileTypes::iter() {
                         ui.selectable_value(
-                            &mut self.main_suffix,
+                            &mut self.compare_suffix,
                             file_type.clone(),
                             file_type.to_string(),
                         );
@@ -164,21 +158,40 @@ impl Manipulation {
             ui.set_visible(self.show_btn);
             let btn = ui.button("开始执行");
             if btn.clicked() {
-                println!("{:#?}开始执行 {:?}",Local::now(), self.operate_type);
+                println!("{:#?}开始执行 {:?}", Local::now(), self.operate_type);
                 self.msg_list.clear();
                 insert_dir_data("source_data", PathBuf::from(&self.main_dir));
-                insert_dir_data("target_data", PathBuf::from(&self.compare_dir));
-                println!("iam close {:#?}",Local::now());
+                insert_dir_data("compare_data", PathBuf::from(&self.compare_dir));
+                match self.operate_type {
+                    FileOperate::Copy => {
+                        copy_same(&self.target_dir,&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                    }
+                    FileOperate::CopyReserve => {
+                        copy_non_same(&self.target_dir,&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                    }
+                    FileOperate::Delete => {
+                        delete_same(&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                    }
+                    FileOperate::DeleteReserve => {
+                        delete_none_same(&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                    }
+                    FileOperate::Move => {
+                        move_same(&self.target_dir,&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                    }
+                    FileOperate::MoveReserve => {
+                        move_none_same(&self.target_dir,&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                    }
+                }
+                println!("iam close {:#?}", Local::now());
             }
         });
     }
 }
 
-
-fn loading_modal(ctx:&egui::Context)->Modal{
+fn loading_modal(ctx: &egui::Context) -> Modal {
     let modal = Modal::new(ctx, "loading_modal");
 
-// What goes inside the modal
+    // What goes inside the modal
     modal.show(|ui| {
         // these helper functions help set the ui based on the modal's
         // set style, but they are not required and you can put whatever
@@ -187,7 +200,7 @@ fn loading_modal(ctx:&egui::Context)->Modal{
         modal.frame(ui, |ui| {
             ui.spinner();
         });
-       /* modal.buttons(ui, |ui| {
+        /* modal.buttons(ui, |ui| {
             // After clicking, the modal is automatically closed
             if modal.button(ui, "close").clicked() {
             };
