@@ -2,9 +2,9 @@ use std::ffi::OsStr;
 use std::fs;
 use std::path::PathBuf;
 
-use rusqlite::params;
 use crate::cmd::models::FileInfo;
 use crate::utils::db;
+use rusqlite::params;
 
 use crate::utils::db::get_conn;
 
@@ -43,7 +43,7 @@ fn get_file_name_without_ext(path: &PathBuf) -> String {
 ///获取文件名的扩展名
 fn get_file_ext(path: &PathBuf) -> String {
     match path.extension() {
-        None => { "".to_string() }
+        None => "".to_string(),
         Some(ext) => {
             let ext = ext.to_str().unwrap();
             String::from(ext).to_lowercase()
@@ -65,8 +65,7 @@ fn copy(file_vec: &Vec<FileInfo>, target_dir: &String) {
     if !file_vec.is_empty() {
         for file_info in file_vec {
             let target_dir = PathBuf::from(target_dir);
-            let target_path =
-                target_dir.join(format!("{}.{}", &file_info.name, &file_info.ext));
+            let target_path = target_dir.join(format!("{}.{}", &file_info.name, &file_info.ext));
             fs::copy(&file_info.path, target_path).expect("copy error");
         }
     }
@@ -92,7 +91,7 @@ pub fn move_same(target_dir: &String, source_type: &str, target_type: &str) {
     copy(&path_vec, target_dir);
     delete(&path_vec);
 }
-pub fn move_none_same(target_dir: &String,source_type: &str, target_type: &str) {
+pub fn move_none_same(target_dir: &String, source_type: &str, target_type: &str) {
     let path_vec = db::find_non_same_name(source_type, target_type);
     copy(&path_vec, target_dir);
     delete(&path_vec);

@@ -8,7 +8,10 @@ use egui_modal::Modal;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
-use crate::cmd::operator::{copy_non_same, copy_same, delete_none_same, delete_same, insert_dir_data, move_none_same, move_same};
+use crate::cmd::operator::{
+    copy_non_same, copy_same, delete_none_same, delete_same, insert_dir_data, move_none_same,
+    move_same,
+};
 use crate::views::models::{FileOperate, FileTypes};
 
 #[derive(Default, Serialize, Deserialize)]
@@ -164,22 +167,44 @@ impl Manipulation {
                 insert_dir_data("compare_data", PathBuf::from(&self.compare_dir));
                 match self.operate_type {
                     FileOperate::Copy => {
-                        copy_same(&self.target_dir,&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                        copy_same(
+                            &self.target_dir,
+                            &self.main_suffix.to_string(),
+                            &self.compare_suffix.to_string(),
+                        );
                     }
                     FileOperate::CopyReserve => {
-                        copy_non_same(&self.target_dir,&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                        copy_non_same(
+                            &self.target_dir,
+                            &self.main_suffix.to_string(),
+                            &self.compare_suffix.to_string(),
+                        );
                     }
                     FileOperate::Delete => {
-                        delete_same(&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                        delete_same(
+                            &self.main_suffix.to_string(),
+                            &self.compare_suffix.to_string(),
+                        );
                     }
                     FileOperate::DeleteReserve => {
-                        delete_none_same(&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                        delete_none_same(
+                            &self.main_suffix.to_string(),
+                            &self.compare_suffix.to_string(),
+                        );
                     }
                     FileOperate::Move => {
-                        move_same(&self.target_dir,&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                        move_same(
+                            &self.target_dir,
+                            &self.main_suffix.to_string(),
+                            &self.compare_suffix.to_string(),
+                        );
                     }
                     FileOperate::MoveReserve => {
-                        move_none_same(&self.target_dir,&self.main_suffix.to_string(),&self.compare_suffix.to_string());
+                        move_none_same(
+                            &self.target_dir,
+                            &self.main_suffix.to_string(),
+                            &self.compare_suffix.to_string(),
+                        );
                     }
                 }
                 println!("iam close {:#?}", Local::now());
