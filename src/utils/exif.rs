@@ -1,10 +1,12 @@
-use std::fs;
+use std::collections::HashMap;
 use std::path::PathBuf;
+use std::process::Command;
+use std::string::FromUtf8Error;
+use rusqlite::Map;
 
-use exif::{Exif, In, Tag};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug,Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct ExifInfo {
     pub camera_model: String,
     pub len_model: String,
@@ -12,33 +14,36 @@ pub struct ExifInfo {
 }
 
 pub fn get_exif(path: &PathBuf) -> ExifInfo {
-    println!("file path:{:?}",&path);
-    let file = fs::File::open(&path).expect("get file error");
-    let mut bufreader = std::io::BufReader::new(&file);
-    let exif_reader = exif::Reader::new();
-    match exif_reader.read_from_container(&mut bufreader) {
-        Ok(exif) => {
-            let camera_model = get_exif_val(Tag::Model, In::PRIMARY, &exif, false);
-            let len_model = get_exif_val(Tag::LensModel, In::PRIMARY, &exif, false);
-            let focal_length = get_exif_val(Tag::FocalLength, In::PRIMARY, &exif, false);
-            return ExifInfo {
-                camera_model,
-                len_model,
-                focal_length,
+    let output_result = Command::new("exiftool").arg(path).output();
+    if output_result.is_ok() {
+        let output = output_result.unwrap();
+        let mut exif_map:HashMap<String,String> = HashMap::new();
+        if output.status.success() {
+            let result = String::from_utf8(output.stdout);
+            if result.is_ok() {
+               let exif_lines = result.unwrap();
+                for line in exif_lines.lines() {
+                    let info = get_exif_info(line);
+                    if !exif_map.contains_key(&info.0) {
+                        exif_map.insert(info.0, info.1);
+                    }
+                }
             }
         }
-        Err(_) => ExifInfo::default()
+       return  map_to_model(exif_map);
+    }
+    ExifInfo::default()
+}
+fn map_to_model(exif_map:HashMap<String,String>)->ExifInfo{
+    ExifInfo{
+        camera_model: exif_map.get("Camera Model Name").map_or("".to_string(), |val| String::from(val)),
+        len_model: exif_map.get("Lens ID").map_or("".to_string(), |val| String::from(val)),
+        focal_length: exif_map.get("Focal Length").map_or("".to_string(), |val|String::from(val)),
     }
 }
-
-fn get_exif_val(tag: Tag, ifd_num: In, exif: &Exif, with_unit: bool) -> String {
-    exif.get_field(tag, ifd_num).map_or("".to_string(), |field| {
-        let val;
-        if with_unit {
-            val = field.display_value().with_unit(&*exif).to_string();
-        } else {
-            val = field.display_value().to_string();
-        }
-        val.trim_matches('"').to_string()
-    })
+fn get_exif_info(info:&str)->(String,String){
+    let index = info.find(":").unwrap();
+    let key =  String::from(&info[..index]);
+    let val = String::from(&info[index+1..]);
+    (String::from(key.trim()),String::from(val.trim()))
 }

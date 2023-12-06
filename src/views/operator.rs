@@ -1,10 +1,12 @@
 use std::fmt::Display;
 use std::path::PathBuf;
+use chrono::Local;
 use eframe::CreationContext;
 
 use eframe::epaint::Color32;
 use eframe::glow::Context;
 use egui::{Label, ProgressBar, Ui, Widget};
+use egui::accesskit::DefaultActionVerb::Select;
 use egui::accesskit::Role::ProgressIndicator;
 use egui::CursorIcon::Progress;
 use egui_modal::Modal;
@@ -34,14 +36,17 @@ pub struct Manipulation {
     pub msg_list: Vec<String>,
     #[serde(skip)]
     operate_type: FileOperate,
+    show_btn:bool
 }
 
 impl Manipulation {
-    pub(crate) fn default() -> Self {
-        Default::default()
+    pub(crate) fn init() -> Self {
+        Manipulation{
+           show_btn:true,
+           ..Manipulation::default()
+       }
     }
     pub fn show(&mut self, ui: &mut Ui) {
-        let mut modal = loading_modal(ui.ctx());
         ui.horizontal(|ui| {
             ui.label("文件操作目录:");
             ui.set_min_width(500.0);
@@ -156,19 +161,14 @@ impl Manipulation {
             ui.add_space(5.0);
         });
         ui.horizontal(|ui| {
+            ui.set_visible(self.show_btn);
             let btn = ui.button("开始执行");
             if btn.clicked() {
-                ui.set_visible(false);
-                println!("开始执行 {:?}", self.operate_type);
+                println!("{:#?}开始执行 {:?}",Local::now(), self.operate_type);
                 self.msg_list.clear();
-                if !&self.main_dir.is_empty() {
-                    insert_dir_data("source_data", PathBuf::from(&self.main_dir));
-                }
-                if !&self.compare_dir.is_empty() {
-                    insert_dir_data("target_data", PathBuf::from(&self.compare_dir));
-                }
-                println!("iam close");
-                // modal.close();
+                insert_dir_data("source_data", PathBuf::from(&self.main_dir));
+                insert_dir_data("target_data", PathBuf::from(&self.compare_dir));
+                println!("iam close {:#?}",Local::now());
             }
         });
     }
@@ -176,7 +176,7 @@ impl Manipulation {
 
 
 fn loading_modal(ctx:&egui::Context)->Modal{
-    let mut modal = Modal::new(ctx, "loading_modal");
+    let modal = Modal::new(ctx, "loading_modal");
 
 // What goes inside the modal
     modal.show(|ui| {

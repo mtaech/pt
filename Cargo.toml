@@ -27,9 +27,6 @@ chrono = { version = "0.4.31", features = ["serde"] }
 strum = {version = "0.25.0",features = ["derive","strum_macros"]}
 lazy_static = "1.4.0"
 rusqlite = { version = "0.30.0", features = ["bundled"] }
-js-sys = "0.3.66"
-kamadak-exif = "0.5.5"
-rawloader = "0.37.1"
 egui-modal = "0.3.1"
 
 [dependencies.libopenraw]

@@ -27,7 +27,7 @@ pub struct PtTabsViewer {
 impl PtTabsViewer {
     pub fn default() -> Self {
         Self {
-            manipulation: Manipulation::default(),
+            manipulation: Manipulation::init(),
         }
     }
 }
