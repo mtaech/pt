@@ -9,21 +9,21 @@ use rusqlite::{Connection, OpenFlags};
 ///初始化字体
 pub fn init_default_font() -> FontDefinitions {
     let mut fonts = egui::FontDefinitions::default();
-    let font = include_bytes!("../../assets/LXGWWenKaiScreen.ttf");
+    let font = include_bytes!("../../assets/LXGWNeoXiHei.ttf");
     fonts.font_data.insert(
-        "LXGWWenKaiScreen".to_owned(),
+        "LXGWNeoXiHei".to_owned(),
         egui::FontData::from_owned(Vec::from(font)),
     );
     fonts
         .families
         .entry(egui::FontFamily::Proportional)
         .or_default()
-        .insert(0, "LXGWWenKaiScreen".to_owned());
+        .insert(0, "LXGWNeoXiHei".to_owned());
     fonts
         .families
         .entry(egui::FontFamily::Monospace)
         .or_default()
-        .push("LXGWWenKaiScreen".to_owned());
+        .push("LXGWNeoXiHei".to_owned());
     fonts
 }
 
