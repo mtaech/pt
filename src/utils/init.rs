@@ -1,15 +1,10 @@
-use std::fs;
-use std::path::PathBuf;
-
 use egui::FontFamily::{Monospace, Proportional};
-use egui::Shape::Path;
 use egui::{Color32, FontDefinitions, FontId, TextStyle, Visuals};
-use rusqlite::{Connection, OpenFlags};
 
 ///初始化字体
 pub fn init_default_font() -> FontDefinitions {
     let mut fonts = egui::FontDefinitions::default();
-    let font = include_bytes!("../../assets/LXGWNeoXiHei.ttf");
+    let font = include_bytes!("../../assets/LXGWWenKaiScreen.ttf");
     fonts.font_data.insert(
         "LXGWNeoXiHei".to_owned(),
         egui::FontData::from_owned(Vec::from(font)),

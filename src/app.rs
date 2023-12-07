@@ -1,5 +1,5 @@
-use egui_dock::{DockArea, DockState, Style, TabViewer};
-use egui_modal::Modal;
+use egui_dock::{DockArea, DockState, Style};
+
 
 use crate::tabs::{PtTabsViewer, Tab, TabsDef, TabsId};
 use crate::utils::init;

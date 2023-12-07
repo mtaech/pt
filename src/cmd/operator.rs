@@ -1,4 +1,4 @@
-use std::ffi::OsStr;
+
 use std::fs;
 use std::path::PathBuf;
 
@@ -10,7 +10,7 @@ use crate::utils::db::get_conn;
 
 ///插入表数据
 pub fn insert_dir_data(table_name: &str, dir_path: PathBuf) {
-    let mut conn = get_conn();
+    let conn = get_conn();
     conn.execute(format!("delete from {}", &table_name).as_str(), ())
         .expect("");
     if dir_path.exists() {
