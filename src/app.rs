@@ -21,10 +21,10 @@ impl Default for PtApp {
                 title: "图片操作".to_string(),
                 id: TabsId::Operator,
             },
-            TabsDef {
+           /* TabsDef {
                 title: "图片数据".to_string(),
                 id: TabsId::Analysis,
-            },
+            },*/
         ]
         .into_iter()
         .collect();
