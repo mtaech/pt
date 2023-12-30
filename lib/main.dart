@@ -1,11 +1,18 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:provider/provider.dart';
+import 'package:pt_next/models/operateModel.dart';
 import 'package:pt_next/tools/db.dart';
 
-import 'views/manipulation.dart';
+import 'views/operate.dart';
 
-void main()  {
+void main() {
   initDb();
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => OperateModel(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -21,8 +28,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: "WenKaiScreen",
       ),
-      home: const ManipulationView(title: '文件操作'),
+      home: const OperateView(title: '文件操作'),
+      builder:FlutterSmartDialog.init()
     );
   }
 }
-

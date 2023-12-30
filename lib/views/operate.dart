@@ -1,26 +1,26 @@
-import 'dart:developer' as developer;
+import 'dart:developer';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:pt_next/models/operateModel.dart';
+import 'package:pt_next/tools/common.dart';
+import 'package:pt_next/tools/db.dart';
 
+import '../tools/image.dart';
 import '../enums.dart';
 
-class ManipulationView extends StatefulWidget {
-  const ManipulationView({super.key, required this.title});
+class OperateView extends StatefulWidget {
+  const OperateView({super.key, required this.title});
 
   final String title;
 
   @override
-  State<ManipulationView> createState() => _ManipulationView();
+  State<OperateView> createState() => _OperateView();
 }
 
-class _ManipulationView extends State<ManipulationView> {
-  final TextEditingController mainDirController = TextEditingController();
-  final TextEditingController mainTypeController = TextEditingController();
-  final TextEditingController compareDirController = TextEditingController();
-  final TextEditingController compareTypeController = TextEditingController();
-  final TextEditingController targetDirController = TextEditingController();
-  final TextEditingController manipulationTypeController =
-      TextEditingController();
+class _OperateView extends State<OperateView> {
+  final OperateModel operateModel = OperateModel();
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +42,10 @@ class _ManipulationView extends State<ManipulationView> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     PathDirWidget(
-                        controller: mainDirController, labelText: "文件操作目录"),
+                        controller: operateModel.mainDir, labelText: "文件操作目录"),
                     const SizedBox(width: 20),
                     FileTypeWidget(
-                        controller: mainTypeController, labelText: "文件操作类型")
+                        controller: operateModel.mainType, labelText: "文件操作类型")
                   ],
                 ),
               ),
@@ -56,10 +56,11 @@ class _ManipulationView extends State<ManipulationView> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     PathDirWidget(
-                        controller: compareDirController, labelText: "文件对比目录"),
+                        controller: operateModel.compareDir,
+                        labelText: "文件对比目录"),
                     const SizedBox(width: 20),
                     FileTypeWidget(
-                      controller: mainTypeController,
+                      controller: operateModel.compareType,
                       labelText: "文件对比类型",
                     ),
                   ],
@@ -72,10 +73,11 @@ class _ManipulationView extends State<ManipulationView> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     PathDirWidget(
-                        controller: targetDirController, labelText: "操作目标目录"),
+                        controller: operateModel.targetDir,
+                        labelText: "操作目标目录"),
                     const SizedBox(width: 20),
                     FileOperateWidget(
-                        controller: manipulationTypeController,
+                        controller: operateModel.operateTypeText,
                         labelText: "文件操作类型"),
                   ],
                 ),
@@ -85,36 +87,7 @@ class _ManipulationView extends State<ManipulationView> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: Stack(
-                        children: <Widget>[
-                          Positioned.fill(
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: <Color>[
-                                    Color(0xFF1976D2),
-                                    Color(0xFF1976D2),
-                                    Color(0xFF1976D2),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.all(16.0),
-                            ),
-                            onPressed: () {},
-                            child: const Text('执行操作'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  children: [ExecButton(operateModel: operateModel)],
                 ),
               )
             ],
@@ -136,7 +109,6 @@ class PathDirWidget extends StatefulWidget {
 
 class _PathDirField extends State<PathDirWidget> {
   Future<void> chooseDir(String type) async {
-    developer.log("log type", name: type);
     String? dirPath = await FilePicker.platform.getDirectoryPath();
     if (dirPath != null) {
       widget.controller.text = dirPath;
@@ -176,6 +148,7 @@ class _FileTypeSelectField extends State<FileTypeWidget> {
   Widget build(BuildContext context) {
     return DropdownMenu<FileTypes>(
       label: Text(widget.labelText),
+      controller: widget.controller,
       initialSelection: FileTypes.RW2,
       dropdownMenuEntries:
           FileTypes.values.map<DropdownMenuEntry<FileTypes>>((FileTypes type) {
@@ -202,16 +175,77 @@ class FileOperateWidget extends StatefulWidget {
 class _FileOperateSelectField extends State<FileOperateWidget> {
   @override
   Widget build(BuildContext context) {
-    return DropdownMenu<FileOperates>(
+    return DropdownMenu<OperateTypes>(
       label: Text(widget.labelText),
-      initialSelection: FileOperates.Copy,
-      dropdownMenuEntries: FileOperates.values
-          .map<DropdownMenuEntry<FileOperates>>((FileOperates type) {
-        return DropdownMenuEntry<FileOperates>(
+      initialSelection: OperateTypes.Copy,
+      controller: widget.controller,
+      dropdownMenuEntries: OperateTypes.values
+          .map<DropdownMenuEntry<OperateTypes>>((OperateTypes type) {
+        return DropdownMenuEntry<OperateTypes>(
           value: type,
           label: type.label,
         );
       }).toList(),
     );
+  }
+}
+
+class ExecButton extends StatefulWidget {
+  final OperateModel operateModel;
+
+  const ExecButton({super.key, required this.operateModel});
+
+  @override
+  State<StatefulWidget> createState() => _ExecButton();
+}
+
+class _ExecButton extends State<ExecButton> {
+
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton.icon(
+      style: FilledButton.styleFrom(
+        padding: const EdgeInsets.all(16.0),
+      ),
+      onPressed: () async {
+        SmartDialog.showLoading(msg: "操作执行···");
+        var result = validOperate(widget.operateModel, context);
+        if (result) {
+          insertOperateDate(widget.operateModel.mainDir.text,
+              widget.operateModel.compareDir.text);
+          execOperate(widget.operateModel);
+        }
+        await Future.delayed(const Duration(seconds: 1));
+        SmartDialog.dismiss();
+        buildSnackBar(context, "操作已执行完成");
+      },
+      icon: const Icon(Icons.done_all) ,
+      label: const Text("执行操作"),
+    );
+  }
+}
+
+void execOperate(OperateModel operateModel) async {
+  var operateText = operateModel.operateTypeText.text;
+  OperateTypes operateType = getOperateType(operateText);
+  List<FileInfo> fileList = [];
+  if (isSameType(operateType)) {
+    fileList = await findSame(
+        operateModel.mainType.text, operateModel.compareType.text);
+  } else {
+    fileList = await findNotSame(
+        operateModel.mainType.text, operateModel.compareType.text);
+  }
+  log("file list size ${fileList.length}");
+  if (operateType == OperateTypes.Copy ||
+      operateType == OperateTypes.CopyReserve) {
+    copyFiles(fileList, operateModel.targetDir.text);
+  } else if (operateType == OperateTypes.Delete ||
+      operateType == OperateTypes.DeleteReserve) {
+    deleteFiles(fileList);
+  } else if (operateType == OperateTypes.Move ||
+      operateType == OperateTypes.MoveReserve) {
+    moveFiles(fileList, operateModel.targetDir.text);
   }
 }

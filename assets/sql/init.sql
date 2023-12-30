@@ -6,7 +6,7 @@ create table source_data
     name         text not null default '',
     path         text not null default '',
     ext          text not null default '',
-    size         integer       default 0,
+    size         text       default '0',
     camera_model text not null default '',
     len_model    text not null default '',
     focal_length text not null default ''
@@ -18,7 +18,7 @@ create table compare_data
     name         text not null,
     path         text not null,
     ext          text not null default '',
-    size         integer       default 0,
+    size         text       default '0',
     camera_model text null,
     len_model    text null,
     focal_length text null

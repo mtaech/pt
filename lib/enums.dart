@@ -13,13 +13,14 @@ enum FileTypes {
   const FileTypes(this.label);
   final String label;
 }
-enum FileOperates {
-  Copy("复制同名文件"),
-  CopyReserve("复制非同名文件"),
-  Delete("删除同名文件"),
-  DeleteReserve("删除非同名文件"),
-  Move("移动同名文件"),
-  MoveReserve("移动非同名文件");
-  const FileOperates(this.label);
+enum OperateTypes {
+  Copy("复制同名文件","COPY"),
+  CopyReserve("复制非同名文件","CopyReserve"),
+  Delete("删除同名文件","Delete"),
+  DeleteReserve("删除非同名文件","DeleteReserve"),
+  Move("移动同名文件","Move"),
+  MoveReserve("移动非同名文件","MoveReserve");
+  const OperateTypes(this.label,this.value);
   final String label;
+  final String value;
 }
