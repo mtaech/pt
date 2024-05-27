@@ -7,27 +7,28 @@ rust-version = "1.72"
 
 
 [dependencies]
-egui = "0.24.1"
-eframe = { version = "0.24.1", default-features = false, features = [
+egui = "0.27.2"
+eframe = { version = "0.27.2", default-features = false, features = [
     "accesskit",     # Make egui comptaible with screen readers. NOTE: adds a lot of dependencies.
     "glow",          # Use the glow rendering backend. Alternative: "wgpu".
     "wayland",
     "x11",
     "persistence",  ] }
 log = "0.4"
+egui_extras = "0.27.2"
 
 
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }
-image = "0.24.7"
-rfd = { version = "0.12.1",default-features = false, features = ["xdg-portal","common-controls-v6"] }
-env_logger = "0.10.1"
-egui_dock = {version = "0.9.0",features = ["serde"]}
+rfd = { version = "0.14.1" }
+env_logger = "0.11.3"
+egui_dock = {version = "0.12.0",features = ["serde"]}
 chrono = { version = "0.4.31", features = ["serde"] }
-strum = {version = "0.25.0",features = ["derive","strum_macros"]}
+strum = {version = "0.26.2",features = ["derive","strum_macros"]}
 lazy_static = "1.4.0"
-rusqlite = { version = "0.30.0", features = ["bundled"] }
+rusqlite = { version = "0.31.0", features = ["bundled"] }
 egui-modal = "0.3.1"
+image = "0.25.1"
 
 [dependencies.libopenraw]
 version = "0.1.2"

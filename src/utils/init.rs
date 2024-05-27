@@ -1,5 +1,5 @@
 use egui::FontFamily::{Monospace, Proportional};
-use egui::{Color32, FontDefinitions, FontId, TextStyle, Visuals};
+use egui::{FontDefinitions, FontId, TextStyle};
 
 ///初始化字体
 pub fn init_default_font() -> FontDefinitions {
@@ -36,25 +36,14 @@ fn heading3() -> TextStyle {
 pub fn configure_text_styles(ctx: &egui::Context) {
     let mut style = (*ctx.style()).clone();
     style.text_styles = [
-        (TextStyle::Heading, FontId::new(25.0, Proportional)),
-        (heading2(), FontId::new(22.0, Proportional)),
-        (heading3(), FontId::new(19.0, Proportional)),
-        (TextStyle::Body, FontId::new(16.0, Proportional)),
-        (TextStyle::Monospace, FontId::new(14.0, Monospace)),
-        (TextStyle::Button, FontId::new(14.0, Proportional)),
-        (TextStyle::Small, FontId::new(12.0, Proportional)),
+        (TextStyle::Heading, FontId::new(30.0, Proportional)),
+        (heading2(), FontId::new(26.0, Proportional)),
+        (heading3(), FontId::new(24.0, Proportional)),
+        (TextStyle::Body, FontId::new(20.0, Proportional)),
+        (TextStyle::Monospace, FontId::new(20.0, Monospace)),
+        (TextStyle::Button, FontId::new(20.0, Proportional)),
+        (TextStyle::Small, FontId::new(18.0, Proportional)),
     ]
     .into();
-    ctx.set_style(style);
-}
-///初始化基础样式
-pub fn configure_context_style(ctx: &egui::Context) {
-    let mut style = (*ctx.style()).clone();
-    let mut visuals = Visuals::light();
-    visuals.extreme_bg_color = Color32::WHITE;
-    visuals.extreme_bg_color = Color32::WHITE;
-    visuals.window_fill = Color32::from_rgb(229, 229, 229);
-    style.visuals = visuals;
-    style.spacing.item_spacing.y = 10f32;
     ctx.set_style(style);
 }

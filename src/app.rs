@@ -1,6 +1,5 @@
 use egui_dock::{DockArea, DockState, Style};
 
-
 use crate::tabs::{PtTabsViewer, Tab, TabsDef, TabsId};
 use crate::utils::init;
 
@@ -21,7 +20,7 @@ impl Default for PtApp {
                 title: "图片操作".to_string(),
                 id: TabsId::Operator,
             },
-           /* TabsDef {
+            /* TabsDef {
                 title: "图片数据".to_string(),
                 id: TabsId::Analysis,
             },*/
@@ -45,7 +44,6 @@ impl PtApp {
         let my_font = init::init_default_font();
         cc.egui_ctx.set_fonts(my_font);
         init::configure_text_styles(&cc.egui_ctx);
-        init::configure_context_style(&cc.egui_ctx);
         Default::default()
     }
 }
@@ -53,12 +51,6 @@ impl PtApp {
 impl eframe::App for PtApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            /*  egui::menu::bar(ui, |ui| {
-                ui.menu_button("File", |ui| {
-                    egui::widgets::global_dark_light_mode_buttons(ui);
-                });
-                ui.add_space(16.0);
-            });*/
             egui::widgets::global_dark_light_mode_switch(ui);
         });
 

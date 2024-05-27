@@ -1,9 +1,10 @@
-
 use std::path::PathBuf;
+use std::sync::mpsc::{Receiver, Sender};
 
-use chrono::Local;
+use chrono::{Local, Utc};
 use eframe::epaint::Color32;
-use egui::{Label, Ui};
+use egui::{Label, TextEdit, Ui, Widget, WidgetInfo};
+use egui_extras::{Column, TableBuilder};
 use egui_modal::Modal;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
@@ -14,7 +15,7 @@ use crate::cmd::operator::{
 };
 use crate::views::models::{FileOperate, FileTypes};
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive( Serialize, Deserialize)]
 pub struct Manipulation {
     ///操作目录
     pub main_dir: String,
@@ -33,33 +34,47 @@ pub struct Manipulation {
     pub msg_list: Vec<String>,
     #[serde(skip)]
     operate_type: FileOperate,
-    show_btn: bool,
+    show_tips: bool,
+    done_time: String,
 }
 
 impl Manipulation {
     pub(crate) fn init() -> Self {
         Manipulation {
-            show_btn: true,
-            ..Manipulation::default()
+            main_dir: "".to_string(),
+            compare_dir: "".to_string(),
+            target_dir: "".to_string(),
+            main_suffix: Default::default(),
+            compare_suffix: Default::default(),
+            msg_list: vec![],
+            operate_type: Default::default(),
+            show_tips: false,
+            done_time:"".to_string()
         }
     }
     pub fn show(&mut self, ui: &mut Ui) {
+        let padding = 20.0;
         ui.horizontal(|ui| {
-            ui.label("文件操作目录:");
-            ui.set_min_width(500.0);
-            if ui.text_edit_singleline(&mut self.main_dir).clicked() {
+            ui.label("文件操作目录");
+            let response = ui.add(
+                TextEdit::singleline(&mut self.main_dir)
+                    .hint_text("选择文件操作目录")
+                    .desired_width(ui.available_width() - padding),
+            );
+            if response.clicked() {
                 if let Some(path) = rfd::FileDialog::new().pick_folder() {
                     self.main_dir = path.display().to_string();
                 }
             }
         });
+        ui.add_space(5.0);
         ui.horizontal(|ui| {
             ui.label("文件操作格式");
             egui::ComboBox::from_label("选择格式")
                 .selected_text(format!("{:?}", self.main_suffix))
                 .show_ui(ui, |ui| {
                     ui.style_mut().wrap = Some(false);
-                    ui.set_min_width(60.0);
+                    ui.set_min_width(100.0);
                     for file_type in FileTypes::iter() {
                         ui.selectable_value(
                             &mut self.main_suffix,
@@ -69,11 +84,16 @@ impl Manipulation {
                     }
                 });
         });
+        ui.add_space(5.0);
+
         ui.horizontal(|ui| {
             ui.label("目标对比目录:");
-            ui.set_min_width(500.0);
-            let mut raw_clone = self.compare_dir.clone();
-            if ui.text_edit_singleline(&mut raw_clone).clicked() {
+            let response = ui.add(
+                TextEdit::singleline(&mut self.compare_dir)
+                    .hint_text("选择目标对比目录")
+                    .desired_width(ui.available_width() - padding),
+            );
+            if response.clicked() {
                 if let Some(path) = rfd::FileDialog::new().pick_folder() {
                     self.compare_dir = path.display().to_string();
                 }
@@ -85,7 +105,7 @@ impl Manipulation {
                 .selected_text(format!("{:?}", self.compare_suffix))
                 .show_ui(ui, |ui| {
                     ui.style_mut().wrap = Some(false);
-                    ui.set_min_width(60.0);
+                    ui.set_min_width(100.0);
                     for file_type in FileTypes::iter() {
                         ui.selectable_value(
                             &mut self.compare_suffix,
@@ -95,6 +115,8 @@ impl Manipulation {
                     }
                 });
         });
+        ui.add_space(5.0);
+
         ui.horizontal(|ui| {
             match self.operate_type {
                 FileOperate::Delete => ui.set_visible(false),
@@ -102,21 +124,26 @@ impl Manipulation {
                 _ => ui.set_visible(true),
             }
             ui.label("操作目标目录:");
-            ui.set_min_width(500.0);
-            let mut target_clone = self.target_dir.clone();
-            if ui.text_edit_singleline(&mut target_clone).clicked() {
+            let response = ui.add(
+                TextEdit::singleline(&mut self.target_dir)
+                    .hint_text("选择操作目标目录")
+                    .desired_width(ui.available_width() - padding),
+            );
+            if response.clicked() {
                 if let Some(path) = rfd::FileDialog::new().pick_folder() {
                     self.target_dir = path.display().to_string();
                 }
             }
         });
+        ui.add_space(5.0);
+
         ui.horizontal(|ui| {
             ui.label("文件操作类型:");
             egui::ComboBox::from_label("选择文件操作类型")
                 .selected_text(self.operate_type.to_string())
                 .show_ui(ui, |ui| {
                     ui.style_mut().wrap = Some(false);
-                    ui.set_min_width(60.0);
+                    ui.set_min_width(200.0);
                     for file_operate in FileOperate::iter() {
                         ui.selectable_value(
                             &mut self.operate_type,
@@ -126,6 +153,8 @@ impl Manipulation {
                     }
                 });
         });
+        ui.add_space(5.0);
+
         ui.vertical(|ui| {
             let mut text = "";
             match self.operate_type {
@@ -148,88 +177,127 @@ impl Manipulation {
                     text = "对比操作目录与目标对比目录内的文件。\n如果操作目录内的文件在目标对比目录里不能找到相同文件名的文件，那么将移动操作目录内的该文件至操作目标目录";
                 }
             }
+            ui.add_space(5.0);
+
 
             let rich_text = egui::RichText::new(text)
                 .heading().color(Color32::from_rgb(255, 164, 0))
                 .underline()
-                .size(14.0);
+                .size(18.0);
             ui.add_space(5.0);
             ui.add(Label::new(rich_text));
             ui.add_space(5.0);
         });
+        ui.add_space(5.0);
+
         ui.horizontal(|ui| {
-            ui.set_visible(self.show_btn);
             let btn = ui.button("开始执行");
             if btn.clicked() {
-                println!("{:#?}开始执行 {:?}", Local::now(), self.operate_type);
-                self.msg_list.clear();
-                insert_dir_data("source_data", PathBuf::from(&self.main_dir));
-                insert_dir_data("compare_data", PathBuf::from(&self.compare_dir));
-                match self.operate_type {
-                    FileOperate::Copy => {
-                        copy_same(
-                            &self.target_dir,
-                            &self.main_suffix.to_string(),
-                            &self.compare_suffix.to_string(),
-                        );
-                    }
-                    FileOperate::CopyReserve => {
-                        copy_non_same(
-                            &self.target_dir,
-                            &self.main_suffix.to_string(),
-                            &self.compare_suffix.to_string(),
-                        );
-                    }
-                    FileOperate::Delete => {
-                        delete_same(
-                            &self.main_suffix.to_string(),
-                            &self.compare_suffix.to_string(),
-                        );
-                    }
-                    FileOperate::DeleteReserve => {
-                        delete_none_same(
-                            &self.main_suffix.to_string(),
-                            &self.compare_suffix.to_string(),
-                        );
-                    }
-                    FileOperate::Move => {
-                        move_same(
-                            &self.target_dir,
-                            &self.main_suffix.to_string(),
-                            &self.compare_suffix.to_string(),
-                        );
-                    }
-                    FileOperate::MoveReserve => {
-                        move_none_same(
-                            &self.target_dir,
-                            &self.main_suffix.to_string(),
-                            &self.compare_suffix.to_string(),
-                        );
-                    }
-                }
-                println!("iam close {:#?}", Local::now());
+                self.execute_operate();
             }
         });
+        ui.horizontal(|ui| {
+            ui.set_visible(self.show_tips);
+            let rich_text = egui::RichText::new(format!("成功执行完成！{}",self.done_time))
+                .heading().color(Color32::from_rgb(255, 164, 0))
+                .underline()
+                .size(18.0);
+            ui.label(rich_text);
+        });
+        ui.add_space(5.0);
+        ui.separator();
+        ui.add_space(5.0);
+        // self.table_ui(ui);
     }
 }
 
-fn loading_modal(ctx: &egui::Context) -> Modal {
-    let modal = Modal::new(ctx, "loading_modal");
+impl Manipulation {
+    fn execute_operate(&mut self,){
 
-    // What goes inside the modal
-    modal.show(|ui| {
-        // these helper functions help set the ui based on the modal's
-        // set style, but they are not required and you can put whatever
-        // ui you want inside [`.show()`]
-        // modal.title(ui, "loading");
-        modal.frame(ui, |ui| {
-            ui.spinner();
+        println!("{:#?}开始执行 {:?}", Local::now(), self.operate_type);
+        self.msg_list.clear();
+        insert_dir_data("source_data", PathBuf::from(&self.main_dir));
+        insert_dir_data("compare_data", PathBuf::from(&self.compare_dir));
+        match self.operate_type {
+            FileOperate::Copy => {
+                copy_same(
+                    &self.target_dir,
+                    &self.main_suffix.to_string(),
+                    &self.compare_suffix.to_string(),
+                );
+            }
+            FileOperate::CopyReserve => {
+                copy_non_same(
+                    &self.target_dir,
+                    &self.main_suffix.to_string(),
+                    &self.compare_suffix.to_string(),
+                );
+            }
+            FileOperate::Delete => {
+                delete_same(
+                    &self.main_suffix.to_string(),
+                    &self.compare_suffix.to_string(),
+                );
+            }
+            FileOperate::DeleteReserve => {
+                delete_none_same(
+                    &self.main_suffix.to_string(),
+                    &self.compare_suffix.to_string(),
+                );
+            }
+            FileOperate::Move => {
+                move_same(
+                    &self.target_dir,
+                    &self.main_suffix.to_string(),
+                    &self.compare_suffix.to_string(),
+                );
+            }
+            FileOperate::MoveReserve => {
+                move_none_same(
+                    &self.target_dir,
+                    &self.main_suffix.to_string(),
+                    &self.compare_suffix.to_string(),
+                );
+            }
+        }
+        self.show_tips = true;
+        self.done_time = Utc::now().to_rfc3339();
+        println!("iam close {:#?}", Local::now());
+    }
+    fn table_ui(&mut self, ui: &mut Ui) {
+        ui.vertical(|ui| {
+            let available_height = ui.available_height();
+            let table = TableBuilder::new(ui)
+                .striped(true)
+                .resizable(true)
+                .cell_layout(egui::Layout::left_to_right(egui::Align::Center))
+                .column(Column::initial(200.0))
+                .column(Column::initial(500.0))
+                .min_scrolled_height(400.0)
+                .max_scroll_height(available_height);
+            table
+                .header(20.0, |mut header| {
+                    header.col(|ui| {
+                        ui.strong("序号");
+                    });
+                    header.col(|ui| {
+                        ui.strong("处理文件");
+                    });
+                })
+                .body(|mut body| {
+                    let mut index = 1;
+                    for msg in &self.msg_list {
+                        body.row(40.0, |mut row| {
+                            row.col(|ui| {
+                                ui.label(format!("{}", index));
+                            });
+                            row.col(|ui| {
+                                ui.label(msg);
+                            });
+                        });
+                        index += 1;
+                    }
+                });
         });
-        /* modal.buttons(ui, |ui| {
-            // After clicking, the modal is automatically closed
-            if modal.button(ui, "close").clicked() {
-            };
-        });*/
-    });
-    modal
+    }
 }

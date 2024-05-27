@@ -1,9 +1,8 @@
-
 use std::fs;
 use std::path::PathBuf;
 
 use crate::cmd::models::FileInfo;
-use rusqlite::{Connection};
+use rusqlite::Connection;
 
 pub fn init_db() {
     if PathBuf::from("./.db").exists() {
