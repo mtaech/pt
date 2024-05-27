@@ -1,11 +1,9 @@
 use std::path::PathBuf;
-use std::sync::mpsc::{Receiver, Sender};
 
-use chrono::{Local, Utc};
+use chrono::Local;
 use eframe::epaint::Color32;
-use egui::{Label, TextEdit, Ui, Widget, WidgetInfo};
+use egui::{Label, TextEdit, Ui};
 use egui_extras::{Column, TableBuilder};
-use egui_modal::Modal;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
@@ -261,7 +259,7 @@ impl Manipulation {
             }
         }
         self.show_tips = true;
-        self.done_time = Utc::now().to_rfc3339();
+        self.done_time = Local::now().to_rfc3339();
         println!("iam close {:#?}", Local::now());
     }
     fn table_ui(&mut self, ui: &mut Ui) {
